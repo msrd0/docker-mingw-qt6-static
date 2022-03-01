@@ -23,6 +23,9 @@ RUN PKG=ninja-samurai kotlin install.kts
 # compile the compiler
 RUN PKG=mingw-w64-rust-bin kotlin install.kts
 
+# install bzip2 library
+RUN PKG=mingw-w64-bzip2-static kotlin install.kts
+
 # install the freetype-bootstrap library
 RUN PKG=mingw-w64-freetype2-bootstrap kotlin install.kts
 
@@ -30,10 +33,16 @@ RUN PKG=mingw-w64-freetype2-bootstrap kotlin install.kts
 RUN PKG=mingw-w64-cairo-bootstrap kotlin install.kts
 
 # install the harfbuzz library
-RUN PKG=mingw-w64-harfbuzz kotlin install.kts
+RUN PKG=mingw-w64-harfbuzz-static kotlin install.kts
 
 # remove the bootstrap library and replace with the real freetype2
-RUN PKG=mingw-w64-freetype2 kotlin install.kts
+RUN PKG=mingw-w64-freetype2-static kotlin install.kts
+
+# install the poppler library
+RUN PKG=mingw-w64-poppler-static kotlin install.kts
+
+# install the pango library
+RUN PKG=mingw-w64-pango-static kotlin install.kts
 
 # install the librsvg library
 RUN PKG=mingw-w64-librsvg kotlin install.kts
