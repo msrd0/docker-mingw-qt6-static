@@ -52,7 +52,10 @@ fun install(pkg: String) {
 
 	// inspect the srcinfo file
 	val srcinfo = File(dir, ".SRCINFO")
+	var pkgver = "*"
+	var pkgrel = "*"
 	val deps = mutableListOf<String>()
+	val makedeps = mutableListOf<String>()
 	val keys = mutableListOf<String>()
 	for (line in srcinfo.readLines()) {
 		val parts = line.trim().split(Regex("\\s+"))
@@ -65,14 +68,21 @@ fun install(pkg: String) {
 			break
 		}
 		
-		if (parts[0] == "depends" || parts[0] == "makedepends") {
+		if (parts[0] == "pkgver") {
+			pkgver = parts[2]
+		} else if (parts[0] == "pkgrel") {
+			pkgrel = parts[2]
+		} else if (parts[0] == "depends") {
 			deps.add(parts[2])
+		} else if (parts[0] == "makedepends") {
+			deps.add(parts[2])
+			makedeps.add(parts[2])
 		} else if (parts[0] == "validpgpkeys") {
 			keys.add(parts[2])
 		}
 	}
 	deps.sort()
-	println("[$pkg] Dependencies: " + deps.joinToString())
+	println("[$pkg] Dependencies: ${deps.joinToString()}")
 
 	if (keys.isNotEmpty()) {
 		run("gpg", "--recv-keys", *keys.toTypedArray())
@@ -83,6 +93,7 @@ fun install(pkg: String) {
 	deps.forEach dep@ { dep ->
 		// check if package is installed already
 		if (test("pacman", "-Qi", dep) != null) {
+			makedeps.remove(dep)
 			return@dep
 		}
 		
@@ -97,7 +108,7 @@ fun install(pkg: String) {
 	}
 	
 	if (installRepo.isNotEmpty()) {
-		run("sudo", "pacman", "-Sy", "--noconfirm", *installRepo.toTypedArray())
+		run("sudo", "pacman", "-Sy", "--asdeps", "--noconfirm", *installRepo.toTypedArray())
 	}
 	
 	installAur.forEach { dep ->
@@ -108,7 +119,12 @@ fun install(pkg: String) {
 	run("makepkg", dir=dir)
 	
 	println("[$pkg] Installing package ...")
-	run("bash", "-euc", "yes | sudo pacman -U $pkg-*.pkg.tar", dir=dir)
+	run("bash", "-euc", "yes | sudo pacman -U $pkg-$pkgver-$pkgrel-*.pkg.tar", dir=dir)
+	
+	if (makedeps.isNotEmpty()) {
+		println("[$pkg] Removing make dependencies: ${makedeps.joinToString()}")
+		run("sudo", "pacman", "-Rscn", "--noconfirm", *makedeps.toTypedArray())
+	}
 	
 	println("[$pkg] Done")
 	if (!dir.deleteRecursively()) {
@@ -118,7 +134,3 @@ fun install(pkg: String) {
 
 val pkg = System.getenv("PKG") ?: die("Missing PKG environment variable")
 install(pkg)
-
-// clean up the repository
-// do not set pipefail - it will trigger since yes never closes its output
-run("bash", "-euc", "yes | sudo pacman -Scc")
