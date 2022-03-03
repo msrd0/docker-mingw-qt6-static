@@ -1,6 +1,6 @@
 FROM archlinux/archlinux:base-devel
 
-LABEL org.opencontainers.image.url="https://github.com/users/msrd0/packages/container/package/mingw-qt6-static"
+LABEL org.opencontainers.image.url="https://github.com/msrd0/docker-mingw-qt6-static/pkgs/container/mingw-qt6-static"
 LABEL org.opencontainers.image.title="mingw-qt6-static"
 LABEL org.opencontainers.image.description="ArchLinux based Docker Image with a mingw toolchain to cross-compile Qt6 for both i686 and x86_64 targets"
 LABEL org.opencontainers.image.source="https://github.com/msrd0/docker-mingw-qt6-static"
