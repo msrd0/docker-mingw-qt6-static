@@ -9,9 +9,6 @@ LABEL org.opencontainers.image.source="https://github.com/msrd0/docker-mingw-qt6
 RUN pacman-key --init \
  && pacman -Syu --needed --noconfirm \
 		git \
-		jdk11-openjdk \
-		jq \
-		kotlin \
 		mingw-w64 \
 		sudo \
  && useradd -m -d /home/user user \
@@ -31,7 +28,11 @@ COPY install.kts .
 RUN set -eux; \
 	sudo pacman-key --recv-keys B9E36A7275FC61B464B67907E06FE8F53CDC6A4C; \
 	sudo pacman-key --lsign-key B9E36A7275FC61B464B67907E06FE8F53CDC6A4C; \
-	sudo pacman -Sy --noconfirm mingw-w64-cmake-static; \
+	sudo pacman -Sy --noconfirm \
+		jdk11-openjdk \
+		jq \
+		kotlin \
+		mingw-w64-cmake-static; \
 	PKG=ninja-samurai kotlin install.kts; \
 	qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w64-qt6-base-static' | jq -r '.results[].Version' | tr '-' ' ' | awk '{print $1}'); \
 	git clone https://aur.archlinux.org/qt6-base-headless; \
@@ -40,6 +41,9 @@ RUN set -eux; \
 	makepkg -si --skipchecksums --noconfirm; \
 	popd; \
 	rm -rf qt6-base-headless; \
+	sudo pacman -Rscn --noconfirm \
+		postgresql \
+		xmlstarlet; \
 	for pkg in \
 		mingw-w64-rust-bin \
 		mingw-w64-bzip2-static \
@@ -52,4 +56,8 @@ RUN set -eux; \
 	do \
 		PKG=$pkg kotlin install.kts; \
 	done; \
+	sudo pacman -Rscn --noconfirm \
+		jdk11-openjdk \
+		jq \
+		kotlin; \
 	yes | sudo pacman -Scc
