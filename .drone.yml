@@ -1,0 +1,26 @@
+---
+kind: pipeline
+name: docker
+
+trigger:
+  branch:
+    - main
+  event:
+    - cron
+    - custom
+    - push
+  status:
+    - success
+
+steps:
+  - name: docker
+    image: plugins/docker
+    settings:
+      pull_images: true
+      registry: ghcr.io
+      repo: msrd0/mingw-qt6-static
+      username: msrd0
+      password:
+        from_secret: GHCR_TOKEN
+
+...
