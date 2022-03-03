@@ -2,7 +2,7 @@ FROM archlinux/archlinux:base-devel
 
 # install basic prerequisites and create build user
 RUN pacman-key --init \
- && pacman -Sy --needed --noconfirm \
+ && pacman -Syu --needed --noconfirm \
 		git \
 		jdk11-openjdk \
 		jq \
