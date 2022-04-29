@@ -62,6 +62,7 @@ RUN qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w6
 RUN pkgs=" \
 		mingw-w64-cmake-static \
 		mingw-w64-rust-bin \
+		mingw-w64-graphite \
 		mingw-w64-bzip2-static \
 		mingw-w64-libjpeg-turbo-static \
 		mingw-w64-libpng-static \
