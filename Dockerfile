@@ -36,7 +36,8 @@ RUN PKG=ninja-samurai kotlin install.kts; \
 	yes | sudo pacman -Scc
 
 # install mingw stuff from the arch repo but patched
-COPY mingw-w64-crt .
+RUN mkdir mingw-w64-crt
+COPY mingw-w64-crt/PKGBUILD ./mingw-w64-crt/PKGBUILD
 RUN pushd mingw-w64-crt; \
 	makepkg -si --noconfirm; \
 	popd; \

@@ -17,7 +17,9 @@ source=(
     lib64-api-ms-win-core-synch-l1-2-0.def::https://raw.githubusercontent.com/mirror/mingw-w64/984233c02aa796fd5df35323f125bd062bdb3df5/mingw-w64-crt/lib32/api-ms-win-core-synch-l1-2-0.def
 )
 sha512sums=('6691331a2ab521d22c1d32bebe0ed049bd62a7a7722cff38e7792b4e42c6b8df4356084afff6c916b487b3ebddc4372b398ab7cd0c7f4ff6991a70fe64177386'
-            'SKIP')
+            'SKIP'
+            'e448628be45249132aa4e30bf44f0672fd94d3e9fa8774d1433bdb8b31d5ccee20e13953cbf022a3ca2eaef13944d92f5d74638cbbf7b85c07f0cc168690c189'
+            'e448628be45249132aa4e30bf44f0672fd94d3e9fa8774d1433bdb8b31d5ccee20e13953cbf022a3ca2eaef13944d92f5d74638cbbf7b85c07f0cc168690c189')
 
 _targets="i686-w64-mingw32 x86_64-w64-mingw32"
 
