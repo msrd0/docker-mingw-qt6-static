@@ -15,7 +15,6 @@ RUN pacman -Syu --needed --noconfirm \
 		jdk11-openjdk \
 		jq \
 		kotlin \
-		mingw-w64 \
 		sudo \
  && useradd -m -d /home/user user \
  && echo "user ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/user \
@@ -36,6 +35,14 @@ COPY install.kts .
 RUN PKG=ninja-samurai kotlin install.kts; \
 	yes | sudo pacman -Scc
 
+# install mingw stuff from the arch repo but patched
+COPY mingw-w64-crt .
+RUN pushd mingw-w64-crt; \
+	makepkg -si --noconfirm; \
+	popd; \
+	sudo pacman -S --needed --noconfirm mingw-w64; \
+	yes | sudo pacman -Scc
+
 # install qt6-headless host tools
 # hadolint ignore=DL4006
 RUN qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w64-qt6-base-static' | jq -r '.results[].Version' | tr '-' ' ' | awk '{print $1}'); \
@@ -51,8 +58,8 @@ RUN qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w6
 	yes | sudo pacman -Scc
 
 # install all the mingw stuff
-# hadolint ignore=DL4006
-RUN for pkg in \
+# hadolint ignore=DL4006,SC2086
+RUN pkgs=" \
 		mingw-w64-cmake-static \
 		mingw-w64-rust-bin \
 		mingw-w64-bzip2-static \
@@ -63,8 +70,14 @@ RUN for pkg in \
 		mingw-w64-harfbuzz-static \
 		mingw-w64-freetype2-static \
 		mingw-w64-pcre2-static \
-		mingw-w64-qt6-base-static; \
-	do \
+		mingw-w64-qt6-base-static \
+	"; \
+	deps=" \
+		mingw-w64-configure \
+		mingw-w64-meson \
+	"; \
+	for pkg in $deps $pkgs; do \
 		PKG=$pkg kotlin install.kts; \
 	done; \
+	sudo pacman -Rscn --noconfirm $deps \
 	yes | sudo pacman -Scc
