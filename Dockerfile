@@ -39,6 +39,7 @@ RUN PKG=ninja-samurai kotlin install.kts; \
 RUN mkdir mingw-w64-crt
 COPY mingw-w64-crt/PKGBUILD ./mingw-w64-crt/PKGBUILD
 RUN pushd mingw-w64-crt; \
+	gpg --recv-keys CAF5641F74F7DFBA88AE205693BDB53CD4EBC740; \
 	makepkg -si --noconfirm; \
 	popd; \
 	sudo pacman -S --needed --noconfirm mingw-w64; \
