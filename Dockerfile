@@ -82,5 +82,5 @@ RUN pkgs=" \
 	for pkg in $deps $pkgs; do \
 		PKG=$pkg kotlin install.kts; \
 	done; \
-	sudo pacman -Rscn --noconfirm $deps \
+	sudo pacman -Rscn --noconfirm $deps; \
 	yes | sudo pacman -Scc
