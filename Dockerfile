@@ -6,6 +6,7 @@ LABEL org.opencontainers.image.description="ArchLinux based Docker Image with a 
 LABEL org.opencontainers.image.source="https://github.com/msrd0/docker-mingw-qt6-static"
 
 # we can't use pipefail because we use yes|pacman, so we'll disable DL4006 everywhere
+# also shellcheck is dumb and doesn't realize -e here, so we'll disable SC2164 as well
 SHELL ["/usr/bin/bash", "-eux", "-c"]
 
 # install basic prerequisites and create build user
@@ -38,6 +39,7 @@ RUN PKG=ninja-samurai kotlin install.kts; \
 # install mingw stuff from the arch repo but patched
 RUN mkdir mingw-w64-crt
 COPY mingw-w64-crt/PKGBUILD ./mingw-w64-crt/PKGBUILD
+# hadolint ignore=DL4006,SC2164
 RUN pushd mingw-w64-crt; \
 	gpg --recv-keys CAF5641F74F7DFBA88AE205693BDB53CD4EBC740; \
 	makepkg -si --noconfirm; \
@@ -46,7 +48,7 @@ RUN pushd mingw-w64-crt; \
 	yes | sudo pacman -Scc
 
 # install qt6-headless host tools
-# hadolint ignore=DL4006
+# hadolint ignore=DL4006,SC2164
 RUN qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w64-qt6-base-static' | jq -r '.results[].Version' | tr '-' ' ' | awk '{print $1}'); \
 	git clone https://aur.archlinux.org/qt6-base-headless; \
 	pushd qt6-base-headless; \
@@ -71,7 +73,6 @@ RUN pkgs=" \
 		mingw-w64-libpng-static \
 		mingw-w64-freetype2-static-bootstrap \
 		mingw-w64-fontconfig-static \
-		mingw-w64-cairo-bootstrap \
 		mingw-w64-harfbuzz-static \
 		mingw-w64-freetype2-static \
 		mingw-w64-pcre2-static \
