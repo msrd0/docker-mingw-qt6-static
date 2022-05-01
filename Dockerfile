@@ -70,6 +70,7 @@ RUN pkgs=" \
 		mingw-w64-libjpeg-turbo-static \
 		mingw-w64-libpng-static \
 		mingw-w64-freetype2-static-bootstrap \
+		mingw-w64-fontconfig-static \
 		mingw-w64-cairo-bootstrap \
 		mingw-w64-harfbuzz-static \
 		mingw-w64-freetype2-static \
