@@ -25,7 +25,7 @@ WORKDIR /home/user
 
 # install qt6-headless
 # hadolint ignore=DL4006,SC2164
-RUN pacman -Syu --needed --noconfirm --asdeps jq; \
+RUN sudo pacman -Syu --needed --noconfirm --asdeps jq; \
 	qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w64-qt6-base-static' | jq -r '.results[].Version' | tr '-' ' ' | awk '{print $1}'); \
 	git clone https://aur.archlinux.org/qt6-base-headless; \
 	pushd qt6-base-headless; \
