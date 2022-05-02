@@ -41,6 +41,7 @@ RUN pkgs=" \
 		mingw-w64-graphite \
 		mingw-w64-bzip2-static \
 		mingw-w64-brotli-static \
+		mingw-w64-curl-static \
 		mingw-w64-libjpeg-turbo-static \
 		mingw-w64-libpng-static \
 		mingw-w64-freetype2-static-bootstrap \
