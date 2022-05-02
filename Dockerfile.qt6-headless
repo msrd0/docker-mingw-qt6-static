@@ -1,0 +1,37 @@
+FROM archlinux/archlinux:base-devel
+
+LABEL org.opencontainers.image.title="qt6-headless"
+LABEL org.opencontainers.image.description="ArchLinux based Docker Image with the qt6-base-headless package installed"
+
+# we can't use pipefail because we use yes|pacman, so we'll disable DL4006 everywhere
+# also shellcheck is dumb and doesn't realize -e here, so we'll disable SC2164 as well
+SHELL ["/usr/bin/bash", "-eux", "-c"]
+
+# install basic prerequisites and create build user
+# hadolint ignore=DL4006
+RUN pacman -Syu --needed --noconfirm \
+		git \
+		sudo; \
+	useradd -m -d /home/user user; \
+	echo "user ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/user; \
+	yes | pacman -Scc
+
+# copy our pacman and makepkg config
+COPY pacman.conf /etc/pacman.conf
+COPY makepkg.conf /etc/makepkg.conf
+
+USER user
+WORKDIR /home/user
+
+# install qt6-headless
+# hadolint ignore=DL4006,SC2164
+RUN pacman -Syu --needed --noconfirm --asdeps jq; \
+	qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w64-qt6-base-static' | jq -r '.results[].Version' | tr '-' ' ' | awk '{print $1}'); \
+	git clone https://aur.archlinux.org/qt6-base-headless; \
+	pushd qt6-base-headless; \
+	sed -E -i -e "s,_qtver=.*,_qtver=$qtver," PKGBUILD; \
+	makepkg -si --skipchecksums --noconfirm; \
+	popd; \
+	rm -rf qt6-base-headless; \
+	sudo pacman -Rscn --noconfirm $(pacman -Qtdq); \
+	yes | sudo pacman -Scc

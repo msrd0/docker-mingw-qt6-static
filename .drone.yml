@@ -17,6 +17,16 @@ steps:
     image: plugins/docker
     settings:
       pull_images: true
+      repo: ghcr.io/msrd0/qt6-headless
+      cache_from: ghcr.io/msrd0/qt6-headless
+      registry: ghcr.io
+      username: msrd0
+      password:
+        from_secret: GHCR_TOKEN
+      
+  - name: docker
+    image: plugins/docker
+    settings:
       repo: ghcr.io/msrd0/mingw-qt6-static
       registry: ghcr.io
       username: msrd0

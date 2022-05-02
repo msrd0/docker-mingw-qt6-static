@@ -1,9 +1,7 @@
-FROM archlinux/archlinux:base-devel
+FROM ghcr.io/msrd0/qt6-headless
 
-LABEL org.opencontainers.image.url="https://github.com/msrd0/docker-mingw-qt6-static/pkgs/container/mingw-qt6-static"
 LABEL org.opencontainers.image.title="mingw-qt6-static"
 LABEL org.opencontainers.image.description="ArchLinux based Docker Image with a mingw toolchain to cross-compile Qt6 for both i686 and x86_64 targets"
-LABEL org.opencontainers.image.source="https://github.com/msrd0/docker-mingw-qt6-static"
 
 # we can't use pipefail because we use yes|pacman, so we'll disable DL4006 everywhere
 # also shellcheck is dumb and doesn't realize -e here, so we'll disable SC2164 as well
@@ -11,22 +9,10 @@ SHELL ["/usr/bin/bash", "-eux", "-c"]
 
 # install basic prerequisites and create build user
 # hadolint ignore=DL4006
-RUN pacman -Syu --needed --noconfirm \
-		git \
+RUN sudo pacman -Syu --needed --noconfirm \
 		jdk11-openjdk \
-		jq \
-		kotlin \
-		sudo \
- && useradd -m -d /home/user user \
- && echo "user ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/user \
- && yes | pacman -Scc
-
-# copy our pacman and makepkg config
-COPY pacman.conf /etc/pacman.conf
-COPY makepkg.conf /etc/makepkg.conf
-
-USER user
-WORKDIR /home/user
+		kotlin; \
+	yes | sudo pacman -Scc
 
 # copy install script
 COPY install.kts .
@@ -45,20 +31,6 @@ RUN pushd mingw-w64-crt; \
 	makepkg -si --noconfirm; \
 	popd; \
 	sudo pacman -S --needed --noconfirm mingw-w64; \
-	yes | sudo pacman -Scc
-
-# install qt6-headless host tools
-# hadolint ignore=DL4006,SC2164
-RUN qtver=$(curl -s 'https://aur.archlinux.org/rpc/?v=5&type=info&arg[]=mingw-w64-qt6-base-static' | jq -r '.results[].Version' | tr '-' ' ' | awk '{print $1}'); \
-	git clone https://aur.archlinux.org/qt6-base-headless; \
-	pushd qt6-base-headless; \
-	sed -E -i -e "s,_qtver=.*,_qtver=$qtver," PKGBUILD; \
-	makepkg -si --skipchecksums --noconfirm; \
-	popd; \
-	rm -rf qt6-base-headless; \
-	sudo pacman -Rscn --noconfirm \
-		postgresql \
-		xmlstarlet; \
 	yes | sudo pacman -Scc
 
 # install all the mingw stuff
