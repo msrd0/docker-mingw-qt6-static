@@ -13,7 +13,7 @@ trigger:
     - success
 
 steps:
-  - name: docker
+  - name: qt6-headless
     image: plugins/docker
     settings:
       pull_images: true
@@ -24,7 +24,7 @@ steps:
       password:
         from_secret: GHCR_TOKEN
       
-  - name: docker
+  - name: mingw-qt6-static
     image: plugins/docker
     settings:
       repo: ghcr.io/msrd0/mingw-qt6-static
