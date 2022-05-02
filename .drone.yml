@@ -16,6 +16,7 @@ steps:
   - name: qt6-headless
     image: plugins/docker
     settings:
+      dockerfile: Dockerfile.qt6-headless
       pull_images: true
       repo: ghcr.io/msrd0/qt6-headless
       cache_from: ghcr.io/msrd0/qt6-headless
