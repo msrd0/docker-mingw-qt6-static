@@ -49,7 +49,7 @@ RUN pkgs=" \
 		mingw-w64-harfbuzz-static \
 		mingw-w64-freetype2-static \
 		mingw-w64-pcre2-static \
-		mingw-w64-qt6-base-static \
+		mingw-w64-qt6-base-static-nosql \
 	"; \
 	deps=" \
 		mingw-w64-configure \
