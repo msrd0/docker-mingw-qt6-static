@@ -7,29 +7,28 @@ LABEL org.opencontainers.image.description="ArchLinux based Docker Image with a 
 # also shellcheck is dumb and doesn't realize -e here, so we'll disable SC2164 as well
 SHELL ["/usr/bin/bash", "-eux", "-c"]
 
-# install basic prerequisites and create build user
+# install basic prerequisites
 # hadolint ignore=DL4006
 RUN sudo pacman -Syu --needed --noconfirm \
 		jdk11-openjdk \
 		kotlin; \
-	yes | sudo pacman -Scc
+	yes | sudo pacman -Scc \
+	mkdir mingw-w64-crt
 
-# copy install script
+# copy files
 COPY install.kts .
-
-# we'll use samu instead of ninja for deterministic builds
-# hadolint ignore=DL4006
-RUN PKG=ninja-samurai kotlin install.kts; \
-	yes | sudo pacman -Scc
-
-# install mingw stuff from the arch repo but patched
-RUN mkdir mingw-w64-crt
 COPY mingw-w64-crt/PKGBUILD ./mingw-w64-crt/PKGBUILD
+
+# we'll use samu instead of ninja for deterministic builds, and we'll patch mingw
+# stuff to not have symbols missing in msvc
 # hadolint ignore=DL4006,SC2164
-RUN pushd mingw-w64-crt; \
+RUN PKG=ninja-samurai kotlin install.kts; \
+	yes | sudo pacman -Scc; \
+	pushd mingw-w64-crt; \
 	gpg --recv-keys CAF5641F74F7DFBA88AE205693BDB53CD4EBC740; \
 	makepkg -si --noconfirm; \
 	popd; \
+	rm -rf mingw-w64-crt; \
 	sudo pacman -S --needed --noconfirm mingw-w64; \
 	yes | sudo pacman -Scc
 
@@ -37,7 +36,6 @@ RUN pushd mingw-w64-crt; \
 # hadolint ignore=DL4006,SC2086
 RUN pkgs=" \
 		mingw-w64-cmake-static \
-		mingw-w64-rust-bin \
 		mingw-w64-graphite \
 		mingw-w64-bzip2-static \
 		mingw-w64-brotli-static \
