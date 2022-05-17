@@ -12,7 +12,7 @@ SHELL ["/usr/bin/bash", "-eux", "-c"]
 RUN sudo pacman -Syu --needed --noconfirm \
 		jdk11-openjdk \
 		kotlin; \
-	yes | sudo pacman -Scc \
+	yes | sudo pacman -Scc; \
 	mkdir mingw-w64-crt
 
 # copy files
